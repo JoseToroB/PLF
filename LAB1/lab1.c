@@ -38,6 +38,73 @@ int esDecimal(char*s){
     return 0;
     
 }
+int esIdentificador(char* s){
+    //para que una entrada sea identificador debe cumplir con tener solo alfanumericos y _ ademas de no comenzar con un digito
+    //ya que en la imagen se entiende que un identificador puede comenzar con _ o letra, luego puede terminar, contare ese caso como posible
+    //es decir, _ ya es un identificador por si solo, ademas de que este caracter no es reservado ni utilizado en los simbolos, no deberia ser problema con ello
+    int l=strlen(s);
+    int i;
+    //revisamos los casos en que no comience con una letra o con un _
+    if((isalpha(s[0]))||(s[0]=='_')){//si comienza con letra o _ se revisa el resto
+        int contador=0;//ya revise la primera pos pero la revisare denuevo igualmente
+        for(i=0;i<l;i++){//ahora recorrere todo el string
+            if((isalpha(s[i]))||('_'==s[i])||(isdigit(s[i]))){//es letra,_ o numero
+                contador++;
+            }
+        }
+        //terminado de revisar el string completo, reviso si todo concuerda
+        if(contador==l){
+            return 1;//si el revise todo el string y todo este concuerda con el formato, si es identificador
+        }
+    }
+    return 0;//si no comienza con letra o _, no es identificador
+    
+    
+    //si estaba compuesto solo por 
+}
+int esExpo(char*s){
+    //enteroE+entero o -
+    //decimalE+entero o -
+    //es decir, maximo un punto, una E, 1 simbolo + o - y solamente digitos luego
+    //como no se si se acepta enteroEentero , es decir sin simbolo, no lo considero valido, es decir, si o si debe llevar signo positivo o negativo
+    int i;
+    int l=strlen(s);
+    int contadorE=0;
+    int contadorPto=0;
+    int contadorSigno=0;
+    int contadorNumb=0;
+    //al finalizar de revisar los contadores sumados deben ser = a l, contadorE, contadorSigno y contadorPto no deben ser mayores que 1
+    for(i=0;i<l;i++){
+        if(s[i]=='E'){//E
+            if(contadorE==1){//si entra denuevo y el contador ya es 1, significa que encontro una segunda coincidencia
+                return 0;
+            }
+            contadorE++;
+        }
+        if((s[i]=='+')||(s[i]=='-')){//signo
+             if(contadorSigno==1){//si entra denuevo y el contador ya es 1, significa que encontro una segunda coincidencia
+                return 0;
+            }
+            contadorSigno++;
+        }
+        if(s[i]=='.'){//punto
+            if(contadorPto==1){//si entra denuevo y el contador ya es 1, significa que encontro una segunda coincidencia
+                return 0;
+            }
+            contadorPto++;
+        }
+        if(isdigit(s[i])){//digitos
+            contadorNumb++;
+        }
+    }
+    int total=contadorE+contadorNumb+contadorPto+contadorSigno;
+    //reviso igualmente que cumplan el formato
+    if((contadorE==1)&&(contadorPto==1)&&(contadorSigno==1)&&(total==l)){
+        return 1;
+    }
+    return 0;//si no cumple se retorna 0
+}
+
 int revisartexto(char* s,char* nombre){
     FILE * salida;
     salida = fopen(nombre, "w");//creo el archivo de salida
@@ -47,25 +114,39 @@ int revisartexto(char* s,char* nombre){
     for(i=0;i<30;i++){
         if(strcmp(s,pres[i])==0){
             //printf("%s despues\n",PRES[i]);  //cambiar a fprint
-            return 0;
+            return 1;
         }
     }
     //ahora reviso si es un simbolo reservado
     for(i=0;i<19;i++){
         if(strcmp(s,sres[i])==0){
             //cambiar a fprin printf("%s\n",s);
-            return 0;
+            return 1;
         }
     }
     //en otro caso reviso si corresponde a algun tipo de dato como identificador, digito,etc
-    //si es entero, se imprimira int largo=strlen(s);//se obtiene el largo del string para recorrerlo
-    esEntero(s);
-    esDecimal(s);
-    /*
-    esIdentificador();
-    esExpo();
-    */
+    if(esEntero(s)){
+       // printf("%s es entero\n",s); cambiar a fprint
+        return 1;
+    }
+    if(esDecimal(s)){
+        // printf("%s es decimal\n",s); cambiar a fprint
+        return 1;
+    }
+    if(esIdentificador(s)){
+        // printf("%s es identificador\n",s); cambiar a fprint
+        return 1;
+    }
+    if(esExpo(s)){
+        // printf("%s es expo\n",s); cambiar a fprint
+        return 1;
+    }
     //sino, reviso caracter a caracter
+    //primero creare un buffer para almacenar lo leido, con el largo correspondiente +1
+    int l=strlen(s);
+    char* buffer=(char*)malloc(sizeof(char)*(l+1));
+    //con esto revisare los casos donde vengan cosas juntas por ejemplo for123, entregando en el archivo de salida FOR\nENTERO\n
+    
     return 0;
 
 }
