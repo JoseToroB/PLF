@@ -1,5 +1,7 @@
-program () .. . ..
-1.23E+23
-sdas
-12E12
-123
+program ()
+.. ...
+_ad3;if(_ad3=fd)
+23E-2
+2.3
+23
+do
