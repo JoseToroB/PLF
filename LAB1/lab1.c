@@ -149,7 +149,6 @@ int revisartexto(char* s,FILE* salida){
     //primero reviso si corresponde tal cual esta a una de las palabras reservadas
     for(i=0;i<30;i++){
         if(strcmp(s,pres[i])==0){
-            printf("%s\n",PRES[i]);  //borrar
             fprintf(salida,"%s\n",PRES[i]);//se printea la mayuscula
             return 1;
         }
@@ -157,30 +156,47 @@ int revisartexto(char* s,FILE* salida){
     //ahora reviso si es un simbolo reservado
     for(i=0;i<19;i++){
         if(strcmp(s,sres[i])==0){
-            printf("%s\n",sres[i]); //borrar
+            //se revisa si es un caso especial sino se printea el simbolo correspondiente
+            if(i==14){
+                fprintf(salida,"RANGO\n");
+                return 1;
+            }
+            if(i==15){
+                fprintf(salida,"ASIGNACI%cN\n",162);
+                return 1;
+            }
+            if(i==16){
+                fprintf(salida,"MENOR_IGUAL\n");
+                return 1;
+            }
+            if(i==17){
+                fprintf(salida,"DISTINTO\n");
+                return 1;
+            }
+            if(i==18){
+                fprintf(salida,"MAYOR_IGUAL\n");
+                return 1;
+            }
+
             fprintf(salida,"%s\n",sres[i]);
+            
             return 1;
         }
     }
     //en otro caso reviso si corresponde a algun tipo de dato como identificador, digito,etc
     if(esEntero(s)){
-       printf("ENTERO\n"); //borrar
         fprintf(salida,"ENTERO\n");
         return 1;
     }
     if(esDecimal(s)){
-        printf("DEC\n"); //borrar
         fprintf(salida,"DECIMAL\n");
         return 1;
     }
     if(esIdentificador(s)){
-       printf("IDE\n"); //borrar
         fprintf(salida,"IDENTIFICADOR\n");
         return 1;
     }
     if(esExpo(s)){
-        //printf("%s es expo\n",s); //cambiar a fprint
-        printf("EXPO\n"); //borrar
         fprintf(salida,"EXPONENCIAL\n");
         return 1;
     }
@@ -192,18 +208,13 @@ int revisartexto(char* s,FILE* salida){
     }
     if(l==2){//si l es 2, significa que puede ser la combinacion de dos simbolos permitidos, pero sin espaciar
     //por ende reviso cada caso en particular
-        if( (s[0]==';')||(s[0]=='.')||(s[0]=='=') ||(s[0]==':') ||(s[0]==',') ||(s[0]=='+') ||(s[0]=='-') ||(s[0]==39) ||(s[0]=='(') ||(s[0]==')') ||(s[0]=='<') ||(s[0]=='>') ||(s[0]=='*') ||(s[0]=='/') ){
+        if(( (s[0]==';')||(s[0]=='.')||(s[0]=='=') ||(s[0]==':') ||(s[0]==',') ||(s[0]=='+') ||(s[0]=='-') ||(s[0]==39) ||(s[0]=='(') ||(s[0]==')') ||(s[0]=='<') ||(s[0]=='>') ||(s[0]=='*') ||(s[0]=='/') )&&( (s[1]==';')|(s[1]=='=') ||(s[1]==':') ||(s[1]==',') ||(s[1]=='+') ||(s[1]=='-') ||(s[1]==39) ||(s[1]=='(') ||(s[1]==')') ||(s[1]=='<') ||(s[1]=='>') ||(s[1]=='*') ||(s[1]=='/') )){
             //si el primer caracter es alguno de los reservador de largo 1, lo muestro
            // printf("%c y ",s[0]);//cambiar a fprint
-           printf("%c\n",s[0]); //borrar
            fprintf(salida,"%c\n",s[0]);
+           fprintf(salida,"%c\n",s[1]);
+           return 1;
 
-        }
-        if( (s[1]==';')||(s[1]=='.')||(s[1]=='=') ||(s[1]==':') ||(s[1]==',') ||(s[1]=='+') ||(s[1]=='-') ||(s[1]==39) ||(s[1]=='(') ||(s[1]==')') ||(s[1]=='<') ||(s[1]=='>') ||(s[1]=='*') ||(s[1]=='/') ){
-            //si el primer caracter es alguno de los reservador de largo 1, lo muestro
-            //printf("%c\n",s[1]);//cambiar a fprint
-            printf("%c\n",s[1]); //borrar
-            fprintf(salida,"%c\n",s[1]);
         }
 
         return 0;//si entro en los casos que corresponde solo saldra.
@@ -227,6 +238,8 @@ int revisartexto(char* s,FILE* salida){
         strncat(buffer,&auxchar1,1);
     }
     i=1;
+    int j;
+    int printeado=0;
     l++;//aumento en 1 el l ya que ha dado problemas por falta de rango sin razon alguna
     while(i!=l){
         //leido un caracter, reviso si tengo algo actualmente
@@ -240,16 +253,70 @@ int revisartexto(char* s,FILE* salida){
             auxchar2=s[i+1];
             strncat(bufferaux,&auxchar2,1);
             if(esAlgo(bufferaux)){
-                //si este caso se cumple, entonces añado al buffer 
-                
-            }else{
+                //si al seguir agregando datos, cumple con otro valor que sirva, entonces sigo
+            }
+            else{
                 //si al agregar una posicion mas, no cumple ningun formato se printea
                 //y se reinician los buffers
-                printf("%s BUFFER\n",buffer); //borrar
-                fprintf(salida,"%s\n",buffer);
-
+                //ver tipo de dato y printearlo
+                for(j=0;j<30;j++){
+                    if((strcmp(buffer,pres[j])==0)&&(printeado!=1)){
+                        printeado++;
+                        fprintf(salida,"%s\n",PRES[j]);//se printea la mayuscula
+                    }
+                }
+                //ver si es simbolo
+                for(j=0;j<19;j++){
+                    if((strcmp(buffer,sres[j])==0)&&(printeado!=1)){
+                        //se revisa si es un caso especial sino se printea el simbolo correspondiente
+                        if((j==14)&&(printeado!=1)){
+                            fprintf(salida,"RANGO\n");
+                            printeado++;
+                        }
+                        if((j==15)&&(printeado!=1)){
+                            fprintf(salida,"ASIGNACI%cN\n",162);
+                            printeado++;
+                        }
+                        if((j==16)&&(printeado!=1)){
+                            fprintf(salida,"MENOR_IGUAL\n");
+                            printeado++;
+                        }
+                        if((j==17)&&(printeado!=1)){
+                            fprintf(salida,"DISTINTO\n");
+                            printeado++;
+                        }
+                        if((j==18)&&(printeado!=1)){
+                            fprintf(salida,"MAYOR_IGUAL\n");
+                            printeado++;
+                        }
+                        if(printeado!=1){
+                            fprintf(salida,"%s\n",sres[j]);
+                            printeado++;
+                        }
+                    }         
+                }
+                //resto de tipos de datos
+                if((esEntero(buffer))&&(printeado!=1)){
+                    fprintf(salida,"ENTERO\n");
+                strcpy(buffer,"");
+                }
+                if((esDecimal(buffer))&&(printeado!=1)){
+                    fprintf(salida,"DECIMAL\n");
+                strcpy(buffer,"");
+                }
+                if((esExpo(buffer))&&(printeado!=1)){
+                    fprintf(salida,"EXPONENCIAL\n");
+                    strcpy(buffer,"");
+                }
+                if((esIdentificador(buffer))&&(printeado!=1)){
+                    printeado++;
+                    fprintf(salida,"IDENTIFICADOR\n");
+                    strcpy(buffer,"");
+                }
+                //reset de los buffers y flag
                 strcpy(buffer,"");
                 strcpy(bufferaux,"");
+                printeado=0;
             }
         }else{
 
